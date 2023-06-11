@@ -53,40 +53,103 @@ CatFileCreator {
  modelId RealESRGAN_replica
  outputScale 4
  name CatFileCreator1
- xpos -303
- ypos -232
+ label "replication of the foundry cat file"
+ xpos -509
+ ypos 34
  postage_stamp false
 }
 ColorWheel {
  inputs 0
  gamma 0.45
  name ColorWheel1
- xpos -268
- ypos -127
+ xpos -372
+ ypos -243
 }
+Dot {
+ name Dot1
+ xpos -338
+ ypos -150
+}
+set Ne6824400 [stack 0]
 Reformat {
  type "to box"
  box_width 1000
  name Reformat1
  label "\[value box_width]"
- xpos -268
- ypos -55
+ xpos -372
+ ypos -91
 }
-set Nba2f9c00 [stack 0]
+set Na648800 [stack 0]
 Inference {
  modelFile ./output/realesrgan_replicated.cat
  serialiseKnob {}
  name Inference1
  label "Replica of Foundry model"
- xpos -268
+ xpos -372
+ ypos 34
+}
+CatFileCreator {
+ inputs 0
+ torchScriptFile ./output/realesrgan_tiled.pt
+ catFile ./output/realesrgan_tiled.cat
+ channelsIn "rgba.red, rgba.green, rgba.blue"
+ channelsOut "rgba.red, rgba.green, rgba.blue"
+ modelId RealESRGAN_tiled
+ outputScale 4
+ name CatFileCreator2
+ label "Tiled model"
+ xpos 10
+ ypos -29
+ postage_stamp false
+ addUserKnob {20 User}
+ addUserKnob {3 tile_size l "Tile Size" t "The image is going to be subdivided in separate sqare tiles. This knob controlls how large the tiles will be in pixel size. This also controlls how much GPU memory will be used. Lower tile size reduces the amount of needed memory."}
+ tile_size 200
+}
+push $Na648800
+Inference {
+ modelFile C:/Users/Lukas/PycharmProjects/RealESRGAN4Nuke/output/realesrgan_tiled.cat
+ serialiseKnob {tile_size:100;}
+ name Inference3
+ label "Tiled Model"
+ xpos -160
+ ypos 32
+}
+push $Ne6824400
+Dot {
+ name Dot2
+ xpos -36
+ ypos -150
+}
+Reformat {
+ type "to box"
+ box_width 4000
+ name Reformat2
+ label "\[value box_width]"
+ xpos -70
+ ypos -85
+}
+set N6f233c00 [stack 0]
+Inference {
+ modelFile ./output/realesrgan_replicated.cat
+ serialiseKnob {}
+ name Inference2
+ label "Replica of Foundry model"
+ xpos -279
+ ypos 35
+}
+push $N6f233c00
+Inference {
+ modelFile C:/Users/Lukas/PycharmProjects/RealESRGAN4Nuke/output/realesrgan_tiled.cat
+ serialiseKnob {tile_size:100;}
+ name Inference4
+ label "Tiled Model"
+ xpos -70
  ypos 30
 }
-push $Nba2f9c00
 Viewer {
- frame 1
  frame_range 1-100
  viewerProcess "sRGB (ACES)"
  name Viewer1
- xpos -110
- ypos 44
+ xpos 93
+ ypos 61
 }
