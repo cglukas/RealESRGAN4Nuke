@@ -1,6 +1,6 @@
 """File for converting the pretrained Real-ESRGAN model into a torchscript file."""
 import torch
-from basicsr.archs.rrdbnet_arch import RRDBNet
+from modified_rrdbnet_arch import RRDBNet
 from basicsr.utils.download_util import load_file_from_url
 from torch import nn
 
