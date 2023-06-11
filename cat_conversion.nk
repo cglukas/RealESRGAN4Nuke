@@ -1,0 +1,92 @@
+#! C:/Program Files/Nuke13.2v6/nuke-13.2.6.dll -nx
+version 13.2 v6
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="-1" y="-8" w="1920" h="1032" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="959"/>
+            <splitter orientation="2">
+                <split size="874"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="116"/>
+                <dock id="" activePageId="Progress.1">
+                    <page id="Progress.1"/>
+                    <page id="DopeSheet.1"/>
+                    <page id="Curve Editor.1"/>
+                </dock>
+            </splitter>
+            <split size="957"/>
+            <dock id="" activePageId="DAG.1" focus="true">
+                <page id="DAG.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name C:/Users/Lukas/PycharmProjects/RealESRGAN4Nuke/cat_conversion.nk
+ project_directory "\[python \{nuke.script_directory()\}]"
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement OCIO
+ OCIO_config custom
+ customOCIOConfigPath "C:/Program Files/Nuke13.2v1/plugins/OCIOConfigs/configs/aces_1.2/config.ocio"
+ defaultViewerLUT "OCIO LUTs"
+ workingSpaceLUT scene_linear
+ monitorLut ACES/Rec.709
+ monitorOutLUT "sRGB (ACES)"
+ int8Lut matte_paint
+ int16Lut texture_paint
+ logLut compositing_log
+ floatLut scene_linear
+}
+CatFileCreator {
+ inputs 0
+ torchScriptFile ./output/realesrgan_replicated.pt
+ catFile ./output/realesrgan_replicated.cat
+ channelsIn "rgba.red, rgba.green, rgba.blue"
+ channelsOut "rgba.red, rgba.green, rgba.blue"
+ modelId RealESRGAN_replica
+ outputScale 4
+ name CatFileCreator1
+ xpos -303
+ ypos -232
+ postage_stamp false
+}
+ColorWheel {
+ inputs 0
+ gamma 0.45
+ name ColorWheel1
+ xpos -268
+ ypos -127
+}
+Reformat {
+ type "to box"
+ box_width 1000
+ name Reformat1
+ label "\[value box_width]"
+ xpos -268
+ ypos -55
+}
+set Nba2f9c00 [stack 0]
+Inference {
+ modelFile ./output/realesrgan_replicated.cat
+ serialiseKnob {}
+ name Inference1
+ label "Replica of Foundry model"
+ xpos -268
+ ypos 30
+}
+push $Nba2f9c00
+Viewer {
+ frame 1
+ frame_range 1-100
+ viewerProcess "sRGB (ACES)"
+ name Viewer1
+ xpos -110
+ ypos 44
+}
