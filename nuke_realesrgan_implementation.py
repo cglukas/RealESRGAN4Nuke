@@ -27,11 +27,12 @@ def _get_model_state_dict() -> dict:
 class TiledREALESRGAN(nn.Module):
     """Wrapper to convert the RealESRGAN model to a nuke compatible torchscript file."""
 
-    def __init__(self, tile_size: int = 200):
+    def __init__(self, tile_size: int = 200, overlap: int = 10):
         """Initialize the Tiled RealESRGAN.
 
         Args:
             tile_size: size in pixels for the side length of the square tiles.
+            overlap: overlapping in pixels between the tiles. This is useful to hide the edges between the tiles.
         """
         super().__init__()
         self.scale = 4
@@ -47,8 +48,7 @@ class TiledREALESRGAN(nn.Module):
         model.eval()
         self.model = model
         self.tile_size = tile_size
-        self.tile_pad = 10
-        """Overlap between the individual tiles."""
+        self.overlap = overlap
 
     def forward(self, input_tensor: torch.Tensor):
         return self.forward_tiled(input_tensor)
@@ -81,10 +81,10 @@ class TiledREALESRGAN(nn.Module):
                 input_end_y = min(ofs_y + self.tile_size, height)
 
                 # input tile area on total image with padding
-                input_start_x_pad = max(input_start_x - self.tile_pad, 0)
-                input_end_x_pad = min(input_end_x + self.tile_pad, width)
-                input_start_y_pad = max(input_start_y - self.tile_pad, 0)
-                input_end_y_pad = min(input_end_y + self.tile_pad, height)
+                input_start_x_pad = max(input_start_x - self.overlap, 0)
+                input_end_x_pad = min(input_end_x + self.overlap, width)
+                input_start_y_pad = max(input_start_y - self.overlap, 0)
+                input_end_y_pad = min(input_end_y + self.overlap, height)
 
                 # input tile dimensions
                 input_tile_width = input_end_x - input_start_x
@@ -127,7 +127,7 @@ class TiledREALESRGAN(nn.Module):
 def main():
     model = TiledREALESRGAN()
     module = torch.jit.script(model)
-    module.save("output/realesrgan_tiled.pt")
+    module.save("output/realesrgan_tiled_v2.pt")
 
 
 if __name__ == "__main__":
