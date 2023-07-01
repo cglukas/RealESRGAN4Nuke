@@ -19,7 +19,6 @@ Gizmo {
   xpos 829
   ypos 35
  }
-set N18ce3470 [stack 0]
  OCIOColorSpace {
   in_colorspace scene_linear
   out_colorspace color_picking
@@ -28,15 +27,19 @@ set N18ce3470 [stack 0]
   xpos 829
   ypos 75
  }
-set N1b454c00 [stack 0]
  Inference {
   useGPUIfAvailable {{parent.useGPUIfAvailable}}
-  modelFile "\[lsearch -inline [plugins -all realesrgan.cat] *.cat]"
+  modelFile "\[lsearch -inline \[plugins -all realesrgan_tiled_v2.cat] *.cat]"
   halfPrecision {{parent.halfPrecision}}
-  serialiseKnob {}
+  serialiseKnob {overlap:50;tile_size:200;}
   name Inference1
   xpos 829
   ypos 129
+  addUserKnob {20 User}
+  addUserKnob {3 tile_overlap l "Tile Overlapping" t "Overlapping between individual tiles. Increase this value if you can see the edges between tiles. The downside of this is that the processing time will increase."}
+  tile_overlap 50
+  addUserKnob {3 tile_size_gizmo l "Tile Size" t "The image is going to be subdivided in separate sqare tiles. This knob controlls how large the tiles will be in pixel size. This also controlls how much GPU memory will be used. Lower tile size reduces the amount of needed memory."}
+  tile_size_gizmo 200
  }
  OCIOColorSpace {
   in_colorspace color_picking
@@ -49,14 +52,5 @@ set N1b454c00 [stack 0]
   name Output1
   xpos 829
   ypos 302
- }
-push $N18ce3470
-push $N1b454c00
- Viewer {
-  inputs 2
-  frame_range 285-581615
-  name Viewer1
-  xpos 1046
-  ypos 153
  }
 end_group
