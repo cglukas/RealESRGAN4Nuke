@@ -12,6 +12,8 @@ Gizmo {
  addUserKnob {26 channelsIn l "Channels In:" t "The channels the model expects as input." T "rgba.red, rgba.green, rgba.blue"}
  addUserKnob {41 in_colorspace l "Input Colorspace" t "Define the colorspace that the input image is in." T OCIOColorSpace1.in_colorspace}
  addUserKnob {6 halfPrecision l "Optimize for Speed and Memory" t "Whether to process at half float precision. This speeds up execution and enables the processing of larger images, however there is the risk of artifacts with some trained models." +STARTLINE}
+ addUserKnob {41 tile_overlap l "Tile Overlapping" T Inference1.tile_overlap}
+ addUserKnob {41 tile_size_gizmo l "Tile Size" T Inference1.tile_size_gizmo}
 }
  Input {
   inputs 0
@@ -31,13 +33,14 @@ Gizmo {
   useGPUIfAvailable {{parent.useGPUIfAvailable}}
   modelFile "\[lsearch -inline \[plugins -all realesrgan_tiled_v2.cat] *.cat]"
   halfPrecision {{parent.halfPrecision}}
-  serialiseKnob {overlap:50;tile_size:200;}
+  serialiseKnob {overlap:10;tile_size:200;}
   name Inference1
+  knobChanged "\ndef knob_change():\n    node = nuke.thisNode()\n    knob = nuke.thisKnob()\n    if knob.name() != \"tile_overlap\" and knob.name() != \"tile_size_gizmo\":\n        return\n    # Copy the values from the user knobs to the serial knobs on the inference\n    # because they are not created on creation.\n    try:\n        node\[\"overlap\"].setValue(node\[\"tile_overlap\"].value())\n        node\[\"tile_size\"].setValue(node\[\"tile_size_gizmo\"].value())\n    except KeyError as e:\n        if \"overlap\" in str(e) or \"tile_size\" in str(e):\n            nuke.tprint(\"REALESRGAN: Internal inference node is not initialized yet. Can't set the knobs\")\n        else:\n            raise e\nknob_change()\n"
   xpos 829
-  ypos 129
-  addUserKnob {20 User}
+  ypos 128
+  addUserKnob {20 GizmoPanelKnobs}
   addUserKnob {3 tile_overlap l "Tile Overlapping" t "Overlapping between individual tiles. Increase this value if you can see the edges between tiles. The downside of this is that the processing time will increase."}
-  tile_overlap 50
+  tile_overlap 10
   addUserKnob {3 tile_size_gizmo l "Tile Size" t "The image is going to be subdivided in separate sqare tiles. This knob controlls how large the tiles will be in pixel size. This also controlls how much GPU memory will be used. Lower tile size reduces the amount of needed memory."}
   tile_size_gizmo 200
  }
